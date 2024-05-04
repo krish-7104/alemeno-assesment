@@ -10,21 +10,24 @@ import { auth } from "../firebase/config";
 
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../redux/userSlice";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const provider = new GoogleAuthProvider();
-  const [login, setLogin] = useState(false);
   const navigate = useNavigate();
-
+  const data = useSelector((state) => state);
+  const dispatch = useDispatch();
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        setLogin(false);
+        dispatch(logout());
       } else {
-        setLogin(true);
+        const { email, displayName, uid, photoURL } = user;
+        dispatch(login({ id: uid, user: { email, displayName, photoURL } }));
       }
     });
-  }, []);
+  }, [dispatch]);
 
   const googleLoginEventHandler = () => {
     toast.loading("Logging In");
@@ -32,7 +35,6 @@ const Navbar = () => {
       .then(() => {
         toast.dismiss();
         toast.success("Login Successfull");
-        setLogin(true);
         navigate("/dashboard");
       })
       .catch((error) => {
@@ -42,8 +44,10 @@ const Navbar = () => {
       });
   };
   return (
-    <nav className="w-full bg-white flex justify-between items-center mx-auto px-8 py-4 shadow fixed top-0">
-      <p className="font-bold text-xl text-purple-600">Alemeno Courses</p>
+    <nav className="w-full bg-white flex justify-between items-center mx-auto px-8 py-4 shadow fixed top-0 z-30">
+      <Link to={"/"} className="font-bold text-xl text-indigo-600">
+        Alemeno Courses
+      </Link>
       {open && (
         <AiOutlineClose
           size={24}
@@ -63,32 +67,18 @@ const Navbar = () => {
           open ? "flex" : "hidden md:flex"
         } justify-center items-center md:flex-row flex-col bg-white h-[100vh] absolute md:static top-0 w-full md:h-auto md:w-auto left-0 z-10`}
       >
-        <ul className="flex justify-center items-center md:mr-5 mb-5 md:mb-0 md:flex-row flex-col">
-          <li className="font-normal text-[#3A3740] cursor-pointer p-2 mx-3">
-            Home
-          </li>
-          <li className="font-normal text-[#3A3740] cursor-pointer p-2 mx-3">
-            Flashcard
-          </li>
-          <li className="font-normal text-[#3A3740] cursor-pointer p-2 mx-3">
-            Contact
-          </li>
-          <li className="font-normal text-[#3A3740] cursor-pointer p-2 mx-3">
-            FAQ
-          </li>
-        </ul>
-        {!login && (
+        {!data && (
           <button
-            className="rounded-md from-purple-600 to-purple-500 bg-gradient-to-br shadow-md shadow-purple-400/40 px-4 py-2 text-white text-sm font-medium"
+            className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
             onClick={googleLoginEventHandler}
           >
             Login with Google
           </button>
         )}
-        {login && (
+        {data && (
           <Link
             to={"/profile"}
-            className="rounded-md from-purple-600 to-purple-500 bg-gradient-to-br shadow-md shadow-purple-400/40 px-4 py-2 text-white text-sm font-medium"
+            className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
           >
             My Profile
           </Link>

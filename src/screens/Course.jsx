@@ -38,7 +38,7 @@ const Course = () => {
   }, [courses, searchText]);
 
   return (
-    <section className="min-h-[90vh]">
+    <section className="min-h-[90vh] pt-24">
       <p className="text-4xl font-semibold text-center my-10">Our Courses</p>
       <div className="flex justify-center items-center relative w-[35%] mx-auto">
         <input
@@ -46,11 +46,11 @@ const Course = () => {
           value={searchText}
           placeholder="Enter Course Title or Instructor..."
           onChange={(e) => setSearchText(e.target.value)}
-          className="bg-gray-200/50 px-4 py-3 rounded-full w-full outline-none border caret-purple-600 text-sm"
+          className="bg-slate-200/50 px-4 py-3 rounded-full w-full outline-none border caret-indigo-600 text-sm"
         />
         {searchText && (
           <AiOutlineClose
-            className="absolute right-4 text-xl text-purple-600 cursor-pointer"
+            className="absolute right-4 text-xl text-indigo-600 cursor-pointer"
             onClick={() => setSearchText("")}
           />
         )}
@@ -68,8 +68,8 @@ const Course = () => {
             instructor={course.instructor}
             image={course.thumbnail}
             status={course.enrollmentStatus}
-            students={course?.students?.length}
-            id={course.id}
+            students={course?.students}
+            courseId={course.id}
           />
         ))}
       </div>

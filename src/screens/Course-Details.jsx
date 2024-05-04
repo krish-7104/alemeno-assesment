@@ -1,14 +1,25 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, arrayUnion, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
 import { useParams } from "react-router-dom";
+import { UserIcon } from "../components/UserIcon";
+import Accordian from "../components/Accordian";
+import { useSelector } from "react-redux";
+import firebase from "firebase/compat/app";
+
 const CourseDetails = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const { user, id } = useSelector((state) => state.user);
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState();
+  useEffect(() => {
+    getCourseById();
+  }, [params.id]);
+
   const getCourseById = async () => {
     try {
-      const courseDocRef = doc(db, "courses", id);
+      const courseDocRef = doc(db, "courses", params.id);
       const courseSnapshot = await getDoc(courseDocRef);
       if (courseSnapshot.exists()) {
         const courseData = courseSnapshot.data();
@@ -22,68 +33,111 @@ const CourseDetails = () => {
       return null;
     }
   };
-  useEffect(() => {
-    getCourseById();
-  }, []);
+
+  const enrollStudentToCourse = async () => {
+    try {
+      const courseRef = doc(db, "courses", params.id);
+      await updateDoc(courseRef, {
+        students: arrayUnion(id),
+      });
+      getCourseById();
+    } catch (error) {
+      console.error("Error enrolling student:", error);
+    }
+  };
+
   return (
-    <section className="max-h-[100vh] overflow-hidden bg-gray-100">
+    <section className="max-h-[100vh] overflow-hidden bg-slate-100">
       {data && (
         <section className="flex justify-evenly h-screen">
-          <div className="w-[35%] sticky top-28 pt-28 flex justify-start items-start flex-col px-10">
-            <p className="mb-4 font-semibold text-2xl border-l-8 border-l-purple-600 pl-2">
-              Course Details
-            </p>
+          <div className="w-[35%] sticky top-28 pt-28 flex justify-start items-start flex-col px-10 overflow-y-scroll courseDetail">
             <img
               src={data.thumbnail}
               width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
+              className="rounded-md shadow-md shadow-indigo-600/30"
             />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
+            <div className="my-5">
+              <p className="font-semibold text-2xl">{data.name}</p>
+              <p className="mt-2 flex justify-start items-center text-slate-800">
+                <UserIcon /> {data.instructor}
+              </p>
+              <p className="mt-2 text-slate-700 text-sm">{data.description}</p>
+            </div>
           </div>
-          <div className="w-[65%] overflow-y-scroll pt-28 courseDetail bg-white p-10">
-            <img
-              src={data.thumbnail}
-              width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
-            />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
-            <img
-              src={data.thumbnail}
-              width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
-            />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
-            <img
-              src={data.thumbnail}
-              width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
-            />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
-            v
-            <img
-              src={data.thumbnail}
-              width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
-            />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
-            <img
-              src={data.thumbnail}
-              width={420}
-              className="rounded-md shadow-md shadow-purple-600/30"
-            />
-            <p className="font-semibold text-2xl mt-4">{data.name}</p>
-            <p className="text-lg mt-1">{data.instructor}</p>
-            <p className="mt-1">{data.description}</p>
+          <div className="w-[65%] overflow-y-scroll pt-24 courseDetail bg-white p-8">
+            <div className="flex justify-evenly items-center mb-6 bg-slate-100 p-4 border">
+              <div className="w-full flex justify-center items-center flex-col">
+                <p className="font-semibold text-sm mb-2">Duration</p>
+                <p>{data.duration}</p>
+              </div>
+              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
+              <div className="w-full flex justify-center items-center flex-col">
+                <p className="font-semibold text-sm mb-2">Location</p>
+                <p>{data.location}</p>
+              </div>
+              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
+              <div className="w-full flex justify-center items-center flex-col">
+                <p className="font-semibold text-sm mb-2">Enrollment Status</p>
+                <p>{data.enrollmentStatus}</p>
+              </div>
+              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
+              <div className="w-full flex justify-center items-center flex-col">
+                <p className="font-semibold text-sm mb-2">Enrolled Students</p>
+                <p>{data?.students?.length ? data?.students?.length : 0}</p>
+              </div>
+            </div>
+            <div className="mb-5">
+              <p className="font-semibold text-sm flex justify-start items-center text-indigo-600">
+                Schedule
+              </p>
+              <p>{data.schedule}</p>
+            </div>
+            <div className="mb-5">
+              <p className="font-semibold text-sm flex justify-start items-center text-indigo-600">
+                Prerequisites
+              </p>
+              <div className="mt-2 gap-4 flex flex-wrap">
+                {data.prerequisites.map((item) => (
+                  <span
+                    key={item + data.name}
+                    className="text-xs border px-4 py-1 rounded-full"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold text-sm flex justify-start items-center text-indigo-600 mb-3">
+                Syllabus
+              </p>
+              {data.syllabus.map((item, index) => (
+                <Accordian
+                  key={"accordian" + index}
+                  index={index}
+                  open={open}
+                  setOpen={setOpen}
+                  topic={item.topic}
+                  week={item.week}
+                  content={item.content}
+                />
+              ))}
+            </div>
+            {data.enrollmentStatus !== "Closed" &&
+              !data.students.includes(id) && (
+                <button
+                  className="rounded-md block mx-auto w-[26%] from-indigo-600 to-indigo-600 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white font-medium mt-10"
+                  onClick={enrollStudentToCourse}
+                >
+                  Enroll Now
+                </button>
+              )}
+            {data.enrollmentStatus !== "Closed" &&
+              data.students.includes(id) && (
+                <p className="rounded-md block mx-auto w-[26%] shadow-md bg-slate-700 px-4 py-2 text-white font-medium mt-10 text-center">
+                  Already Enrolled
+                </p>
+              )}
           </div>
         </section>
       )}
