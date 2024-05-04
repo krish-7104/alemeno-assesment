@@ -1,14 +1,17 @@
 import { useSelector } from "react-redux";
 import CourseCard from "../components/CourseCard";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Link, useNavigate } from "react-router-dom";
+import { UserIcon } from "../components/UserIcon";
+import { GiProgression } from "react-icons/gi";
+import Progress from "../components/Progress";
 
 const Profile = () => {
   const { user, id } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [profileData, setProfileData] = useState([]);
 
   useEffect(() => {
     if (!id) navigate("/");
@@ -25,9 +28,32 @@ const Profile = () => {
         const enrolledCourses = coursesData.filter((data) =>
           data.students.includes(id)
         );
-        setData(enrolledCourses);
+        fetchProfileData(enrolledCourses);
       } catch (error) {
         console.error("Error fetching courses:", error);
+      }
+    };
+
+    const fetchProfileData = async (enrolledCourses) => {
+      try {
+        const studentRef = doc(db, "students", id);
+        const docSnapshot = await getDoc(studentRef);
+        if (docSnapshot.exists()) {
+          const profileCourses = docSnapshot.data().courses;
+          const mergedCourses = profileCourses.map((profileCourse) => {
+            const matchedCourse = enrolledCourses.find(
+              (course) => course.id === profileCourse.courseId
+            );
+            if (matchedCourse) {
+              return { ...matchedCourse, ...profileCourse };
+            } else {
+              return profileCourse;
+            }
+          });
+          setProfileData(mergedCourses);
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
       }
     };
 
@@ -53,26 +79,48 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      {data.length !== 0 && (
+      {profileData.length !== 0 && (
         <p className="text-3xl font-semibold text-center my-10">
           Enrolled Courses
         </p>
       )}
       <div className="md:grid md:grid-cols-3 gap-6 w-[90%] mx-auto my-10 flex flex-wrap">
-        {data.map((course) => (
-          <CourseCard
+        {profileData.map((course) => (
+          <Link
             key={course.id}
-            name={course.name}
-            instructor={course.instructor}
-            image={course.thumbnail}
-            status={course.enrollmentStatus}
-            students={course?.students}
-            courseId={course.id}
-          />
+            to={`/course/${course.courseId}`}
+            className="bg-white shadow-md rounded-md cursor-pointer relative group "
+          >
+            <div className="h-[200px] overflow-hidden rounded-t-md">
+              <img
+                src={course.thumbnail}
+                className="w-full object-cover rounded-t-md group-hover:scale-105 transition-animate"
+              />
+            </div>
+            <div className="px-2 mb-3">
+              <p className="mt-2 text-lg font-semibold">{course.name}</p>
+              <p className="text-sm text-slate-600 flex justify-start mt-1 items-center">
+                <UserIcon /> {course.instructor}
+              </p>
+              <p className="text-sm mt-4 text-slate-600 flex justify-start items-center">
+                <Progress progress={course.progress} />
+                <p className="mx-2">{course.progress}%</p>
+              </p>
+            </div>
+            <span
+              className={`px-3 py-1 text-xs rounded-full font-medium ${
+                course.enrollmentStatus === "Open"
+                  ? "bg-green-600"
+                  : "bg-red-600"
+              } text-white absolute top-4 right-4`}
+            >
+              {course.enrollmentStatus}
+            </span>
+          </Link>
         ))}
       </div>
 
-      {data.length === 0 && (
+      {/* {courses.length === 0 && (
         <div className="flex justify-center items-center flex-col">
           <p className="text-center font-medium text-lg text-slate-700">
             No Enrolled Courses Found!
@@ -84,7 +132,7 @@ const Profile = () => {
             Explore Courses
           </Link>
         </div>
-      )}
+      )} */}
     </section>
   );
 };

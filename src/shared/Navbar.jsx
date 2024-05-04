@@ -5,12 +5,13 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth, db } from "../firebase/config";
 
 import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/userSlice";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const Navbar = () => {
   const location = useLocation();
@@ -33,9 +34,27 @@ const Navbar = () => {
   const googleLoginEventHandler = () => {
     toast.loading("Logging In");
     signInWithPopup(auth, provider)
-      .then(() => {
-        toast.dismiss();
-        toast.success("Login Successfull");
+      .then((result) => {
+        const user = result.user;
+        const userId = user.uid;
+        const studentRef = doc(db, "students", userId);
+        getDoc(studentRef).then((docSnapshot) => {
+          if (!docSnapshot.exists()) {
+            setDoc(studentRef, { courses: [] })
+              .then(() => {
+                toast.dismiss();
+                toast.success("Login Successful");
+              })
+              .catch((error) => {
+                console.error("Error creating document: ", error);
+                toast.dismiss();
+                toast.error("Login Failed");
+              });
+          } else {
+            toast.dismiss();
+            toast.success("Login Successful");
+          }
+        });
       })
       .catch((error) => {
         toast.dismiss();

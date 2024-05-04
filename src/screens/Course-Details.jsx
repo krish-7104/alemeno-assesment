@@ -42,13 +42,25 @@ const CourseDetails = () => {
   const enrollStudentToCourse = async () => {
     if (id) {
       try {
+        toast.loading("Enrolling...");
         const courseRef = doc(db, "courses", params.id);
         await updateDoc(courseRef, {
           students: arrayUnion(id),
         });
-        toast.success("Your Are Enrolled!");
+        const studentRef = doc(db, "students", id);
+        await updateDoc(studentRef, {
+          courses: arrayUnion({
+            courseId: params.id,
+            progress: 0,
+            completed: false,
+          }),
+        });
+        toast.dismiss();
+        toast.success("You Are Enrolled!");
         getCourseById();
       } catch (error) {
+        toast.dismiss();
+        toast.error("Try Again Later!");
         console.error("Error enrolling student:", error);
       }
     } else {
