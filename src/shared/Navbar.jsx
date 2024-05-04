@@ -40,7 +40,7 @@ const Navbar = () => {
         const studentRef = doc(db, "students", userId);
         getDoc(studentRef).then((docSnapshot) => {
           if (!docSnapshot.exists()) {
-            setDoc(studentRef, { courses: [] })
+            setDoc(studentRef, { courses: [], likes: [] })
               .then(() => {
                 toast.dismiss();
                 toast.success("Login Successful");

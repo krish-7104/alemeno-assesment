@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import CourseCard from "../components/CourseCard";
 import { AiOutlineClose } from "react-icons/ai";
 import NoDataSvg from "../assets/no-data.svg";
 import Loading from "../components/Loading";
+import { useSelector } from "react-redux";
 const Course = () => {
   const [searchText, setSearchText] = useState("");
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [studentLikes, setStudentLikes] = useState();
+  const { user, id } = useSelector((state) => state.user);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -25,9 +29,22 @@ const Course = () => {
         console.error("Error fetching courses:", error);
       }
     };
+    const fetchStudentData = async () => {
+      try {
+        const studentRef = doc(db, "students", id);
+        const docSnapshot = await getDoc(studentRef);
+        if (docSnapshot.exists()) {
+          setStudentLikes(docSnapshot.data().likes);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
 
     fetchCourses();
-  }, []);
+    fetchStudentData();
+  }, [id]);
 
   useEffect(() => {
     const filtered = courses.filter(
@@ -60,17 +77,29 @@ const Course = () => {
       </div>
       {loading && <Loading />}
       <div className="md:grid md:grid-cols-3 gap-6 w-[90%] mx-auto my-10 flex flex-wrap">
-        {filteredCourses.map((course) => (
-          <CourseCard
-            key={course.id}
-            name={course.name}
-            instructor={course.instructor}
-            image={course.thumbnail}
-            status={course.enrollmentStatus}
-            students={course?.students}
-            courseId={course.id}
-          />
-        ))}
+        {filteredCourses.map(
+          ({
+            id,
+            name,
+            instructor,
+            thumbnail,
+            enrollmentStatus,
+            students,
+            likes,
+          }) => (
+            <CourseCard
+              key={id}
+              name={name}
+              instructor={instructor}
+              image={thumbnail}
+              status={enrollmentStatus}
+              students={students}
+              courseId={id}
+              liked={studentLikes?.includes(id)}
+              likes={likes}
+            />
+          )
+        )}
       </div>
       {!loading && filteredCourses.length === 0 && (
         <div className="flex flex-col justify-center items-center">

@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import NoDataSvg from "../assets/no-data.svg";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
-import { BiChevronLeft } from "react-icons/bi";
+import { BiChevronLeft, BiLike } from "react-icons/bi";
 
 const CourseDetails = () => {
   const params = useParams();
