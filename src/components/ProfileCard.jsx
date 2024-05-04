@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { db } from "../firebase/config";
 import { UserIcon } from "./UserIcon";
 import Progress from "./Progress";
+import { Link } from "react-router-dom";
 
 const ProfileCard = ({ course: initialCourse }) => {
   const { user, id } = useSelector((state) => state.user);
@@ -41,17 +42,20 @@ const ProfileCard = ({ course: initialCourse }) => {
       className="bg-white shadow-md rounded-md cursor-pointer relative"
     >
       <div className="md:h-[200px] rounded-t-md group overflow-hidden">
-        <img
-          src={course.thumbnail}
-          className="w-full object-cover rounded-t-md group-hover:scale-105 transition-animate"
-          alt="Course Thumbnail"
-        />
+        <Link to={`/course/${course.id}`}>
+          <img
+            src={course.thumbnail}
+            className="w-full object-cover rounded-t-md group-hover:scale-105 transition-animate"
+          />
+        </Link>
       </div>
       <div className="px-2 mb-5">
-        <p className="mt-2 text-lg font-semibold">{course.name}</p>
-        <p className="text-sm text-slate-600 flex justify-start mt-1 items-center">
-          <UserIcon /> {course.instructor}
-        </p>
+        <Link to={`/course/${course.id}`}>
+          <p className="mt-2 text-lg font-semibold">{course.name}</p>
+          <p className="text-sm text-slate-600 flex justify-start mt-1 items-center">
+            <UserIcon /> {course.instructor}
+          </p>
+        </Link>
         <p className="text-sm my-4 text-slate-600 flex justify-start items-center">
           <Progress progress={course.progress} />
           <p className="mx-2">{course.progress}%</p>
@@ -72,17 +76,6 @@ const ProfileCard = ({ course: initialCourse }) => {
           </button>
         )}
       </div>
-      <span
-        className={`px-3 py-1 text-xs rounded-full font-medium ${
-          course.enrollmentStatus === "Open"
-            ? "bg-green-600"
-            : course.enrollmentStatus === "In Progress"
-            ? "bg-indigo-600"
-            : "bg-red-600"
-        } text-white absolute top-4 right-4`}
-      >
-        {course.enrollmentStatus}
-      </span>
     </div>
   );
 };

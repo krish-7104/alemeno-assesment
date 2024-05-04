@@ -17,7 +17,6 @@ const CourseCard = ({
   image,
   name,
   instructor,
-  status,
   courseId,
   students,
   liked: initialLiked,
@@ -51,10 +50,12 @@ const CourseCard = ({
   return (
     <div className="bg-white shadow-md rounded-md cursor-pointer relative group ">
       <div className="md:h-[200px] overflow-hidden rounded-t-md relative">
-        <img
-          src={image}
-          className="w-full object-cover rounded-t-md group-hover:scale-105 transition-animate"
-        />
+        <Link to={`/course/${courseId}`}>
+          <img
+            src={image}
+            className="w-full object-cover rounded-t-md group-hover:scale-105 transition-animate"
+          />
+        </Link>
         <div
           className="absolute z-20 bottom-4 right-4 text-sm bg-white px-2 py-1 rounded-lg flex justify-center items-center"
           onClick={LikeHandler}
@@ -74,17 +75,6 @@ const CourseCard = ({
             <UserIcon /> {instructor}
           </p>
         </div>
-        <span
-          className={`px-3 py-1 text-xs rounded-full font-medium ${
-            status === "Open"
-              ? "bg-green-600"
-              : status === "In Progress"
-              ? "bg-indigo-600"
-              : "bg-red-600"
-          } text-white absolute top-4 right-4`}
-        >
-          {status}
-        </span>
         <div className="flex px-4 mx-auto justify-between items-center mb-4 mt-2">
           <p className="text-sm">
             {students.length ? students.length : 0} Students Enrolled

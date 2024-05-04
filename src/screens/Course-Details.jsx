@@ -73,7 +73,7 @@ const CourseDetails = () => {
     <section className="max-h-[100vh] md:overflow-hidden bg-slate-100">
       {!loading && data && (
         <section className="flex justify-evenly h-screen flex-col md:flex-row">
-          <div className="md:w-[35%] w-full md:sticky md:top-28 pt-24 flex justify-start items-start flex-col px-10 md:overflow-y-scroll courseDetail">
+          <div className="md:w-[35%] w-full md:sticky md:top-28 pt-24 flex justify-start items-start flex-col px-5 md:px-10 md:overflow-y-scroll courseDetail">
             <Link
               to="/"
               className="mb-3 rounded-lg text-indigo-600 p-1 cursor-pointer hover:bg-indigo-600 hover:text-white transition-animate"
@@ -93,25 +93,24 @@ const CourseDetails = () => {
               <p className="mt-2 text-slate-700 text-sm">{data.description}</p>
             </div>
           </div>
-          <div className="md:w-[65%] w-full md:overflow-y-scroll md:pt-24 courseDetail bg-white p-8">
-            <div className="flex justify-evenly items-center mb-6 bg-slate-100 p-4 border">
-              <div className="w-full flex justify-center items-center flex-col">
+          <div className="md:w-[65%] w-full md:overflow-y-scroll md:pt-24 courseDetail bg-white p-6 md:p-8">
+            <div className="flex justify-evenly items-center mb-6 bg-slate-100 p-4 border flex-wrap md:flex-nowrap">
+              <div className="w-[50%] md:w-full flex justify-center items-center flex-col border-r-2 border-indigo-600">
                 <p className="font-semibold text-sm mb-2">Duration</p>
                 <p>{data.duration}</p>
               </div>
-              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
-              <div className="w-full flex justify-center items-center flex-col">
+              <div className="w-[50%] md:w-full flex justify-center items-center flex-col md:border-r-2 md:border-indigo-600">
                 <p className="font-semibold text-sm mb-2">Location</p>
                 <p>{data.location}</p>
               </div>
-              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
-              <div className="w-full flex justify-center items-center flex-col">
+              <div className="w-[50%] md:w-full flex justify-center items-center flex-col border-r-2 border-indigo-600 md:mt-0 mt-6">
                 <p className="font-semibold text-sm mb-2">Enrollment Status</p>
                 <p>{data.enrollmentStatus}</p>
               </div>
-              <span className="h-[50px] bg-indigo-600 p-[1px] rounded-full"></span>
-              <div className="w-full flex justify-center items-center flex-col">
-                <p className="font-semibold text-sm mb-2">Enrolled Students</p>
+              <div className="w-[50%] md:w-full flex justify-center items-center flex-col">
+                <p className="font-semibold text-sm mb-2 md:mt-0 mt-6">
+                  Enrolled Students
+                </p>
                 <p>{data?.students?.length ? data?.students?.length : 0}</p>
               </div>
             </div>
@@ -129,7 +128,7 @@ const CourseDetails = () => {
                 {data.prerequisites.map((item) => (
                   <span
                     key={item + data.name}
-                    className="text-xs border px-4 py-1 rounded-full"
+                    className="text-xs border px-4 py-1 rounded-full bg-indigo-500 text-white"
                   >
                     {item}
                   </span>

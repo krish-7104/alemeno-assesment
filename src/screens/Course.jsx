@@ -92,7 +92,6 @@ const Course = () => {
               name={name}
               instructor={instructor}
               image={thumbnail}
-              status={enrollmentStatus}
               students={students}
               courseId={id}
               liked={studentLikes?.includes(id)}

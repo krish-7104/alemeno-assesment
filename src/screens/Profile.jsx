@@ -5,6 +5,7 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Link, useNavigate } from "react-router-dom";
 import ProfileCard from "../components/ProfileCard";
+import Loading from "../components/Loading";
 
 const Profile = () => {
   const { user, id } = useSelector((state) => state.user);
@@ -84,6 +85,7 @@ const Profile = () => {
           Enrolled Courses
         </p>
       )}
+      {loading && <Loading />}
       <div className="md:grid md:grid-cols-3 gap-6 w-[90%] mx-auto my-10 flex flex-wrap">
         {profileData.map((course) => (
           <ProfileCard key={course.id} course={course} />
