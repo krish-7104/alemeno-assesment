@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { BiMenu } from "react-icons/bi";
-import { AiOutlineClose } from "react-icons/ai";
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
-  signOut, // Import signOut from firebase/auth
+  signOut,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
@@ -15,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/userSlice";
 
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
   const location = useLocation();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
@@ -59,58 +56,40 @@ const Navbar = () => {
         toast.error("Logout Failed");
       });
   };
-  console.log(data);
+
   return (
     <nav className="w-full bg-white flex justify-between items-center mx-auto px-8 py-4 shadow fixed top-0 z-30">
       <Link to={"/"} className="font-bold text-xl text-indigo-600">
         Alemeno Courses
       </Link>
-      {open && (
-        <AiOutlineClose
-          size={24}
-          className="relative z-30 md:hidden block"
-          onClick={() => setOpen(false)}
-        />
+      {data && !data?.user?.id && (
+        <button
+          className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
+          onClick={googleLoginEventHandler}
+        >
+          Login with Google
+        </button>
       )}
-      {!open && (
-        <BiMenu
-          size={26}
-          className="relative z-30 md:hidden block"
-          onClick={() => setOpen(true)}
-        />
-      )}
-      <div
-        className={` ${
-          open ? "flex" : "hidden md:flex"
-        } justify-center items-center md:flex-row flex-col bg-white h-[100vh] absolute md:static top-0 w-full md:h-auto md:w-auto left-0 z-10`}
-      >
-        {data && !data?.user?.id && (
-          <button
-            className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
-            onClick={googleLoginEventHandler}
-          >
-            Login with Google
-          </button>
-        )}
-        {data && data?.user?.id && (
-          <>
-            {location.pathname !== "/profile" && (
-              <Link
-                to={"/profile"}
-                className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
-              >
-                My Profile
-              </Link>
-            )}
+      {data && data?.user?.id && (
+        <>
+          {location.pathname !== "/profile" && (
+            <Link
+              to={"/profile"}
+              className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
+            >
+              My Profile
+            </Link>
+          )}
+          {location.pathname === "/profile" && (
             <button
               className="rounded-md from-red-600 to-red-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium ml-4"
               onClick={logoutHandler}
             >
               Logout
             </button>
-          </>
-        )}
-      </div>
+          )}
+        </>
+      )}
     </nav>
   );
 };

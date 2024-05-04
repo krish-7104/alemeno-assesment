@@ -58,10 +58,10 @@ const CourseDetails = () => {
   };
 
   return (
-    <section className="max-h-[100vh] overflow-hidden bg-slate-100">
+    <section className="max-h-[100vh] md:overflow-hidden bg-slate-100">
       {!loading && data && (
-        <section className="flex justify-evenly h-screen">
-          <div className="w-[35%] sticky top-28 pt-24 flex justify-start items-start flex-col px-10 overflow-y-scroll courseDetail">
+        <section className="flex justify-evenly h-screen flex-col md:flex-row">
+          <div className="md:w-[35%] w-full md:sticky md:top-28 pt-24 flex justify-start items-start flex-col px-10 md:overflow-y-scroll courseDetail">
             <Link
               to="/"
               className="mb-3 rounded-lg text-indigo-600 p-1 cursor-pointer hover:bg-indigo-600 hover:text-white transition-animate"
@@ -81,7 +81,7 @@ const CourseDetails = () => {
               <p className="mt-2 text-slate-700 text-sm">{data.description}</p>
             </div>
           </div>
-          <div className="w-[65%] overflow-y-scroll pt-24 courseDetail bg-white p-8">
+          <div className="md:w-[65%] w-full md:overflow-y-scroll md:pt-24 courseDetail bg-white p-8">
             <div className="flex justify-evenly items-center mb-6 bg-slate-100 p-4 border">
               <div className="w-full flex justify-center items-center flex-col">
                 <p className="font-semibold text-sm mb-2">Duration</p>
@@ -143,7 +143,7 @@ const CourseDetails = () => {
             {data.enrollmentStatus !== "Closed" &&
               !data.students.includes(id) && (
                 <button
-                  className="rounded-md block mx-auto w-[26%] from-indigo-600 to-indigo-600 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white font-medium mt-10"
+                  className="rounded-md block mx-auto w-[50%] md:w-[26%] from-indigo-600 to-indigo-600 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white font-medium mt-10"
                   onClick={enrollStudentToCourse}
                 >
                   Enroll Now
@@ -151,7 +151,7 @@ const CourseDetails = () => {
               )}
             {data.enrollmentStatus !== "Closed" &&
               data.students.includes(id) && (
-                <p className="rounded-md block mx-auto w-[26%] shadow-md bg-slate-700 px-4 py-2 text-white font-medium mt-10 text-center">
+                <p className="rounded-md block mx-auto w-[50%] md:w-[26%] shadow-md bg-slate-700 px-4 py-2 text-white font-medium mt-10 text-center">
                   Already Enrolled
                 </p>
               )}

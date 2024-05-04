@@ -40,8 +40,10 @@ const Course = () => {
 
   return (
     <section className="min-h-[90vh] pt-24">
-      <p className="text-4xl font-semibold text-center my-10">Our Courses</p>
-      <div className="flex justify-center items-center relative w-[35%] mx-auto">
+      <p className="text-3xl md:text-4xl font-semibold text-center my-10">
+        Our Courses
+      </p>
+      <div className="flex justify-center items-center relative w-[90%] md:w-[35%] mx-auto">
         <input
           type="text"
           value={searchText}
@@ -57,7 +59,7 @@ const Course = () => {
         )}
       </div>
       {loading && <Loading />}
-      <div className="grid grid-cols-3 gap-6 w-[90%] mx-auto my-10">
+      <div className="md:grid md:grid-cols-3 gap-6 w-[90%] mx-auto my-10 flex flex-wrap">
         {filteredCourses.map((course) => (
           <CourseCard
             key={course.id}

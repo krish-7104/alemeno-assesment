@@ -36,15 +36,17 @@ const Profile = () => {
 
   return (
     <section className="pt-28 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center ">
-        <div className="flex justify-center items-center">
+      <div className="flex justify-center md:justify-between items-center">
+        <div className="flex justify-center items-center flex-col md:flex-row">
           <img
             src={user.photoURL}
-            className="aspect-square rounded-full w-20 border-4 border-indigo-600 mr-4"
+            className="aspect-square rounded-full w-20 border-4 border-indigo-600 md:mr-4"
             alt=""
           />
           <div>
-            <p className="font-medium text-2xl">{user?.displayName}</p>
+            <p className="font-medium text-2xl mt-4 md:mt-0">
+              {user?.displayName}
+            </p>
             <p className="mt-[4px] bg-indigo-600 px-4 py-1 text-xs text-white rounded-full">
               {user?.email}
             </p>
@@ -56,7 +58,7 @@ const Profile = () => {
           Enrolled Courses
         </p>
       )}
-      <div className="grid grid-cols-3 gap-6 w-[90%] mx-auto my-10">
+      <div className="md:grid md:grid-cols-3 gap-6 w-[90%] mx-auto my-10 flex flex-wrap">
         {data.map((course) => (
           <CourseCard
             key={course.id}
@@ -65,7 +67,7 @@ const Profile = () => {
             image={course.thumbnail}
             status={course.enrollmentStatus}
             students={course?.students}
-            id={course.id}
+            courseId={course.id}
           />
         ))}
       </div>
