@@ -1,17 +1,20 @@
 import { doc, arrayUnion, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { UserIcon } from "../components/UserIcon";
 import Accordian from "../components/Accordian";
 import { useSelector } from "react-redux";
-import firebase from "firebase/compat/app";
+import NoDataSvg from "../assets/no-data.svg";
+import toast from "react-hot-toast";
+import Loading from "../components/Loading";
+import { BiChevronLeft } from "react-icons/bi";
 
 const CourseDetails = () => {
   const params = useParams();
   const { user, id } = useSelector((state) => state.user);
   const [data, setData] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState();
   useEffect(() => {
     getCourseById();
@@ -24,8 +27,10 @@ const CourseDetails = () => {
       if (courseSnapshot.exists()) {
         const courseData = courseSnapshot.data();
         setData(courseData);
+        setLoading(false);
       } else {
-        console.log("No such document!");
+        toast.dismiss();
+        setLoading(false);
         return null;
       }
     } catch (error) {
@@ -35,22 +40,34 @@ const CourseDetails = () => {
   };
 
   const enrollStudentToCourse = async () => {
-    try {
-      const courseRef = doc(db, "courses", params.id);
-      await updateDoc(courseRef, {
-        students: arrayUnion(id),
-      });
-      getCourseById();
-    } catch (error) {
-      console.error("Error enrolling student:", error);
+    if (id) {
+      try {
+        const courseRef = doc(db, "courses", params.id);
+        await updateDoc(courseRef, {
+          students: arrayUnion(id),
+        });
+        toast.success("Your Are Enrolled!");
+        getCourseById();
+      } catch (error) {
+        console.error("Error enrolling student:", error);
+      }
+    } else {
+      toast.dismiss();
+      toast.error("Login with Google First!");
     }
   };
 
   return (
     <section className="max-h-[100vh] overflow-hidden bg-slate-100">
-      {data && (
+      {!loading && data && (
         <section className="flex justify-evenly h-screen">
-          <div className="w-[35%] sticky top-28 pt-28 flex justify-start items-start flex-col px-10 overflow-y-scroll courseDetail">
+          <div className="w-[35%] sticky top-28 pt-24 flex justify-start items-start flex-col px-10 overflow-y-scroll courseDetail">
+            <Link
+              to="/"
+              className="mb-3 rounded-lg text-indigo-600 p-1 cursor-pointer hover:bg-indigo-600 hover:text-white transition-animate"
+            >
+              <BiChevronLeft size={28} />
+            </Link>
             <img
               src={data.thumbnail}
               width={420}
@@ -140,6 +157,17 @@ const CourseDetails = () => {
               )}
           </div>
         </section>
+      )}
+      {!loading && !data && (
+        <div className="flex flex-col justify-center items-center min-h-[100vh]">
+          <img src={NoDataSvg} width={300} />
+          <p className="text-center text-xl mt-10">No Courses Found!</p>
+        </div>
+      )}
+      {loading && (
+        <div className="flex flex-col justify-center items-center min-h-[100vh]">
+          <Loading />
+        </div>
       )}
     </section>
   );

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
 import CourseCard from "../components/CourseCard";
-import { AiOutlineClose, AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import NoDataSvg from "../assets/no-data.svg";
+import Loading from "../components/Loading";
 const Course = () => {
   const [searchText, setSearchText] = useState("");
   const [courses, setCourses] = useState([]);
@@ -55,11 +56,7 @@ const Course = () => {
           />
         )}
       </div>
-      {loading && (
-        <div className="flex justify-center items-center mt-20">
-          <AiOutlineLoading3Quarters size={28} className="animate-spin" />
-        </div>
-      )}
+      {loading && <Loading />}
       <div className="grid grid-cols-3 gap-6 w-[90%] mx-auto my-10">
         {filteredCourses.map((course) => (
           <CourseCard

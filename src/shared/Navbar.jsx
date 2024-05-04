@@ -5,19 +5,23 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
+  signOut, // Import signOut from firebase/auth
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/userSlice";
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
   const data = useSelector((state) => state);
   const dispatch = useDispatch();
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -35,7 +39,6 @@ const Navbar = () => {
       .then(() => {
         toast.dismiss();
         toast.success("Login Successfull");
-        navigate("/dashboard");
       })
       .catch((error) => {
         toast.dismiss();
@@ -43,6 +46,20 @@ const Navbar = () => {
         toast.error("Login Failed");
       });
   };
+
+  const logoutHandler = () => {
+    signOut(auth)
+      .then(() => {
+        toast.success("Logout Successful");
+        dispatch(logout());
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Logout Error:", error);
+        toast.error("Logout Failed");
+      });
+  };
+  console.log(data);
   return (
     <nav className="w-full bg-white flex justify-between items-center mx-auto px-8 py-4 shadow fixed top-0 z-30">
       <Link to={"/"} className="font-bold text-xl text-indigo-600">
@@ -67,7 +84,7 @@ const Navbar = () => {
           open ? "flex" : "hidden md:flex"
         } justify-center items-center md:flex-row flex-col bg-white h-[100vh] absolute md:static top-0 w-full md:h-auto md:w-auto left-0 z-10`}
       >
-        {!data && (
+        {data && !data?.user?.id && (
           <button
             className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
             onClick={googleLoginEventHandler}
@@ -75,13 +92,23 @@ const Navbar = () => {
             Login with Google
           </button>
         )}
-        {data && (
-          <Link
-            to={"/profile"}
-            className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
-          >
-            My Profile
-          </Link>
+        {data && data?.user?.id && (
+          <>
+            {location.pathname !== "/profile" && (
+              <Link
+                to={"/profile"}
+                className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
+              >
+                My Profile
+              </Link>
+            )}
+            <button
+              className="rounded-md from-red-600 to-red-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium ml-4"
+              onClick={logoutHandler}
+            >
+              Logout
+            </button>
+          </>
         )}
       </div>
     </nav>

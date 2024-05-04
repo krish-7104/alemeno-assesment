@@ -3,14 +3,17 @@ import CourseCard from "../components/CourseCard";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { user, id } = useSelector((state) => state.user);
-  const logoutHandler = () => {
-    //
-  };
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (!id) navigate("/");
+  }, [id, navigate, user]);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -29,7 +32,8 @@ const Profile = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [id]);
+
   return (
     <section className="pt-28 max-w-6xl mx-auto">
       <div className="flex justify-between items-center ">
@@ -46,12 +50,6 @@ const Profile = () => {
             </p>
           </div>
         </div>
-        <button
-          className="rounded-md from-red-600 to-red-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 text-white text-sm font-medium"
-          onClick={logoutHandler}
-        >
-          Logout
-        </button>
       </div>
       {data.length !== 0 && (
         <p className="text-3xl font-semibold text-center my-10">
@@ -80,7 +78,6 @@ const Profile = () => {
           <Link
             to={"/"}
             className="rounded-md from-indigo-600 to-indigo-500 bg-gradient-to-br shadow-md shadow-indigo-400/40 px-4 py-2 mt-4 text-white text-sm font-medium mx-auto"
-            onClick={logoutHandler}
           >
             Explore Courses
           </Link>
