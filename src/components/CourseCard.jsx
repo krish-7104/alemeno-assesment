@@ -64,14 +64,14 @@ const CourseCard = ({
             <BiSolidLike className="mr-1" />
           ) : (
             <BiLike className="mr-1" />
-          )}{" "}
+          )}
           {likes}
         </div>
       </div>
       <Link to={`/course/${courseId}`}>
         <div>
           <p className="mt-2 text-lg font-semibold mx-3">{name}</p>
-          <p className="text-sm text-slate-600 flex justify-start mx-3 items-center">
+          <p className="text-sm text-slate-600 flex mt-2 justify-start mx-3 items-center">
             <UserIcon /> {instructor}
           </p>
         </div>
